@@ -1,17 +1,51 @@
-import { useState } from "react";
+import { useRef } from "react";
+import { useState} from "react";
 
 
 function App() {
   const [passwordGenerateLength , setPasswordGenerateLength ] = useState(0);
-  const [checkUpper , setCheckUpper ] = useState("");
-  const [checkLower , setCheckLower ] = useState("");
-  const [checkNumber , setCheckNumber ] = useState("");
-  const [checkSymbol , setCheckSymbol ] = useState("");
+  const [checkUpper , setCheckUpper ] = useState(false);
+  const [checkLower , setCheckLower ] = useState(false);
+  const [checkNumber , setCheckNumber ] = useState(false);
+  const [checkSymbol , setCheckSymbol ] = useState(false);
+  const inputRef = useRef(null);
+
   console.log(checkLower,checkNumber,checkSymbol,checkUpper);
 
-  const[generatePassword , setGeneratePassword] = useState(); 
+  const [generatePassword , setGeneratePassword] = useState("No Generate Password"); 
 
-  // console.log(typeof passwordGenerateLength);
+  function createPassword(){
+      let lengthIs = parseInt(passwordGenerateLength);
+
+      let charset = '';
+
+      let passwordIS = '';
+      if (checkUpper) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      if (checkLower) charset += 'abcdefghijklmnopqrstuvwxyz';
+      if (checkNumber) charset += '0123456789';
+      if (checkSymbol) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+      for(let i = 0 ; i < lengthIs ; i++){
+        const randomIndex = Math.floor(Math.random() * charset.length);
+        passwordIS += charset[randomIndex];
+      }
+      setGeneratePassword(passwordIS);
+      // console.log(generatePassword);
+  }
+
+
+  const copyInputText = ()=>{
+    if (inputRef.current) {
+      navigator.clipboard.writeText(inputRef.current.value)
+        .then(() => {
+          console.log('Text copied to clipboard');
+        })
+        .catch((error) => {
+          console.error('Unable to copy text:', error);
+        });
+      }
+  }
+
   return (
     <>
       <main className="flex text-center justify-center p-20 ">
@@ -70,16 +104,22 @@ function App() {
             <input
               type="text"
               className="py-1 px-1 border border-black rounded-md "
-              value={setGeneratePassword}
+              // onChange={(e)=>setGeneratePassword(e.target.value)}
+              value={generatePassword}
+               disabled={true}
+                ref={inputRef}
             ></input>
-            <button type="button" className="text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg mx-2 text-sm px-5 py-2 text-center me-2 mb-2">Copy </button>
+            <button type="button" className="text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 font-medium rounded-lg mx-2 text-sm px-5 py-2 text-center me-2 mb-2"
+            onClick={copyInputText}
+            >Copy </button>
 
           </div>
          
           <button
             type="button"
             className="ml-24 w-fit  text-white bg-gradient-to-r from-green-600 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-1 focus:outline-none focus:ring-black dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg dark:shadow-green-800/80 font-medium rounded-lg text-md px-3 py-2.5 text-center me-2 mb-2"
-          >
+            onClick={createPassword}
+            >
             Generate Password
           </button>
         </div>
